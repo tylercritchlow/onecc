@@ -25,4 +25,14 @@ if(BUILD_TESTING)
     set(ONECC_TEST_INSTALL_DIR "libexec/onecc-tests" CACHE PATH
         "Installation directory for test executables")
     install(TARGETS test_vm RUNTIME DESTINATION "${ONECC_TEST_INSTALL_DIR}")
+    add_executable(test_lexer tests/test_lexer.c src/assembler/lexer.c)
+    target_include_directories(test_lexer PRIVATE src "${GREATEST_INCLUDE_DIR}")
+    set_target_properties(test_lexer PROPERTIES
+        C_STANDARD 17
+        C_STANDARD_REQUIRED YES
+        C_EXTENSIONS NO
+    )
+    add_test(NAME lexer COMMAND test_lexer)
+    set_tests_properties(lexer PROPERTIES TIMEOUT 5)
+    install(TARGETS test_lexer RUNTIME DESTINATION "${ONECC_TEST_INSTALL_DIR}")
 endif()
