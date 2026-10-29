@@ -9,7 +9,8 @@ typedef enum {
   TOKEN_COMMA,
   TOKEN_DIRECTIVE,
   TOKEN_NEWLINE,
-  TOKEN_EOF
+  TOKEN_EOF,
+  TOKEN_ERROR
 } TokenType;
 
 typedef struct {
@@ -21,16 +22,22 @@ typedef struct {
 } Token;
 
 typedef struct {
-    const char *source;
-    size_t start;
-    size_t current;
-    size_t line;
-    size_t column;
-    size_t start_column;
+  const char *source;
+  size_t start;
+  size_t current;
+  size_t line;
+  size_t column;
+  size_t start_column;
 } Lexer;
 
+/* Source must be NUL-terminated and outlive the lexer and its tokens.
+ * Integers are signed decimal; directives are a dot followed by an identifier.
+ * Semicolon comments and horizontal whitespace are skipped; newlines are
+ * tokens. Invalid characters produce TOKEN_ERROR and advance the lexer.
+ */
 void lexer_init(Lexer *lexer, const char *source);
 char lexer_peek(const Lexer *lexer);
+char lexer_peek_next(const Lexer *lexer);
 char lexer_advance(Lexer *lexer);
 
 Token lexer_next(Lexer *lexer);

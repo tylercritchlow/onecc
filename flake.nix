@@ -58,11 +58,20 @@
         tests = self.packages.${system}.default;
       });
 
-      apps = forAllSystems (system: {
+      apps = forAllSystems (system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+        tests = self.packages.${system}.default.tests;
+        runner = pkgs.writeShellScript "onecc-tests" ''
+          status=0
+          "${tests}/bin/test_vm" "$@" || status=1
+          "${tests}/bin/test_lexer" "$@" || status=1
+          exit "$status"
+        '';
+      in {
         test = {
           type = "app";
-          meta.description = "Run the onecc VM tests";
-          program = "${self.packages.${system}.default.tests}/bin/test_vm";
+          meta.description = "Run the onecc VM and lexer tests";
+          program = "${runner}";
         };
       });
 

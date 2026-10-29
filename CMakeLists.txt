@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(onecc VERSION 0.1.0 LANGUAGES C)
 
-add_executable(onecc src/main.c)
+add_executable(onecc src/main.c src/assembler/lexer.c)
 set_target_properties(onecc PROPERTIES
     C_STANDARD 17
     C_STANDARD_REQUIRED YES

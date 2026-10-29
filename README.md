@@ -13,8 +13,9 @@ nix run
 nix run .#test
 ```
 
-Pass `greatest` options after `--`, for example `nix run .#test -- -v` for
-verbose output or `nix run .#test -- -t halted` to filter by test name.
+The test command runs all suites. Pass `greatest` options after `--`, for example `nix run .#test -- -v` for
+verbose output, `nix run .#test -- -s lexer` to filter by suite (`lexer` or
+`vm`), or `nix run .#test -- -t halted` to filter by test name.
 
 Tests use [greatest](https://github.com/silentbicycle/greatest), fetched as a
 Nix input and pinned in `flake.lock`.

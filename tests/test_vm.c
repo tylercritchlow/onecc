@@ -89,8 +89,7 @@ TEST stop_infinite_loop_at_instruction_limit(void) {
   PASS();
 }
 
-int main(int argc, char **argv) {
-  GREATEST_MAIN_BEGIN();
+SUITE(vm) {
   RUN_TEST(running_a_halted_vm_preserves_state);
   RUN_TEST(subtract_two_positive_numbers);
   RUN_TEST(subtract_and_branch_when_negative);
@@ -102,6 +101,10 @@ int main(int argc, char **argv) {
   RUN_TEST(reject_arithmetic_overflow);
   RUN_TEST(self_modifying_instruction);
   RUN_TEST(stop_infinite_loop_at_instruction_limit);
+}
 
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(vm);
   GREATEST_MAIN_END();
 }
