@@ -30,14 +30,11 @@ typedef struct {
   size_t start_column;
 } Lexer;
 
-/* Source must be NUL-terminated and outlive the lexer and its tokens.
- * Integers are signed decimal; directives are a dot followed by an identifier.
- * Semicolon comments and horizontal whitespace are skipped; newlines are
- * tokens. Invalid characters produce TOKEN_ERROR and advance the lexer.
- */
 void lexer_init(Lexer *lexer, const char *source);
 char lexer_peek(const Lexer *lexer);
 char lexer_peek_next(const Lexer *lexer);
 char lexer_advance(Lexer *lexer);
 
 Token lexer_next(Lexer *lexer);
+
+const char *token_name(TokenType type);

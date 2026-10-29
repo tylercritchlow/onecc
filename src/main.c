@@ -3,28 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const char *token_name(TokenType type) {
-  switch (type) {
-  case TOKEN_IDENTIFIER:
-    return "IDENTIFIER";
-  case TOKEN_INTEGER:
-    return "INTEGER";
-  case TOKEN_COLON:
-    return "COLON";
-  case TOKEN_COMMA:
-    return "COMMA";
-  case TOKEN_DIRECTIVE:
-    return "DIRECTIVE";
-  case TOKEN_NEWLINE:
-    return "NEWLINE";
-  case TOKEN_EOF:
-    return "EOF";
-  case TOKEN_ERROR:
-    return "ERROR";
-  }
-  return "UNKNOWN";
-}
-
 int main(int argc, char *argv[]) {
   if (argc != 2) {
     fprintf(stderr, "Usage: %s <file>\n", argv[0]);

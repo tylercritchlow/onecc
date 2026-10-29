@@ -65,12 +65,13 @@
           status=0
           "${tests}/bin/test_vm" "$@" || status=1
           "${tests}/bin/test_lexer" "$@" || status=1
+          "${tests}/bin/test_parser" "$@" || status=1
           exit "$status"
         '';
       in {
         test = {
           type = "app";
-          meta.description = "Run the onecc VM and lexer tests";
+          meta.description = "Run all onecc tests";
           program = "${runner}";
         };
       });

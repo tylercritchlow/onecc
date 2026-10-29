@@ -35,4 +35,14 @@ if(BUILD_TESTING)
     add_test(NAME lexer COMMAND test_lexer)
     set_tests_properties(lexer PROPERTIES TIMEOUT 5)
     install(TARGETS test_lexer RUNTIME DESTINATION "${ONECC_TEST_INSTALL_DIR}")
+    add_executable(test_parser tests/test_parser.c src/assembler/parser.c src/assembler/lexer.c)
+    target_include_directories(test_parser PRIVATE src "${GREATEST_INCLUDE_DIR}")
+    set_target_properties(test_parser PROPERTIES
+        C_STANDARD 17
+        C_STANDARD_REQUIRED YES
+        C_EXTENSIONS NO
+    )
+    add_test(NAME parser COMMAND test_parser)
+    set_tests_properties(parser PROPERTIES TIMEOUT 5)
+    install(TARGETS test_parser RUNTIME DESTINATION "${ONECC_TEST_INSTALL_DIR}")
 endif()

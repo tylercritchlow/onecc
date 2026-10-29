@@ -98,3 +98,20 @@ Token lexer_next(Lexer *lexer) {
   return (Token){type, lexer->source + lexer->start,
                  lexer->current - lexer->start, line, lexer->start_column};
 }
+
+const char *token_name(TokenType type) {
+  static const char *const names[] = {
+      [TOKEN_IDENTIFIER] = "identifier",
+      [TOKEN_INTEGER] = "integer",
+      [TOKEN_COLON] = "':'",
+      [TOKEN_COMMA] = "','",
+      [TOKEN_DIRECTIVE] = "directive",
+      [TOKEN_NEWLINE] = "newline",
+      [TOKEN_EOF] = "end of input",
+      [TOKEN_ERROR] = "invalid character",
+  };
+  if ((unsigned)type >= sizeof(names) / sizeof(names[0])) {
+    return "unknown token";
+  }
+  return names[type];
+}
