@@ -89,7 +89,35 @@ TEST stop_infinite_loop_at_instruction_limit(void) {
   PASS();
 }
 
+TEST input_reads_unsigned_bytes_and_ignores_branch(void) {
+  const int bytes[] = {0, 65, 255};
+  for (size_t i = 0; i < sizeof(bytes) / sizeof(bytes[0]); ++i) {
+    SubleqVM vm = {.memory = {-1, 10, -1, [10] = 123}};
+    ASSERT_EQ(bytes[i], ungetc(bytes[i], stdin));
+    vm_step(&vm);
+    ASSERT_EQ(bytes[i], vm.memory[10]);
+    ASSERT_EQ(3, vm.pc);
+    ASSERT_FALSE(vm.halted);
+  }
+  PASS();
+}
+
+TEST input_rejects_invalid_destinations_without_reading(void) {
+  const int64_t destinations[] = {-1, -2, MEMORY_SIZE};
+  for (size_t i = 0; i < sizeof(destinations) / sizeof(destinations[0]); ++i) {
+    SubleqVM vm = {.memory = {-1, destinations[i], 0}};
+    ASSERT_EQ('Q', ungetc('Q', stdin));
+    vm_step(&vm);
+    ASSERT(vm.halted);
+    ASSERT_EQ(0, vm.pc);
+    ASSERT_EQ('Q', getchar());
+  }
+  PASS();
+}
+
 SUITE(vm) {
+  RUN_TEST(input_reads_unsigned_bytes_and_ignores_branch);
+  RUN_TEST(input_rejects_invalid_destinations_without_reading);
   RUN_TEST(running_a_halted_vm_preserves_state);
   RUN_TEST(subtract_two_positive_numbers);
   RUN_TEST(subtract_and_branch_when_negative);

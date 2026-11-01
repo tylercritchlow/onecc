@@ -31,6 +31,23 @@ void vm_step(SubleqVM *vm) {
   int64_t B = vm->memory[vm->pc + 1];
   int64_t C = vm->memory[vm->pc + 2];
 
+  // A source of -1 reads a byte into B. EOF is stored as -1.
+  if (A == -1) {
+    if (B < 0 || B >= MEMORY_SIZE) {
+      vm->halted = 1;
+      return;
+    }
+    int input = getchar();
+    if (input == EOF && ferror(stdin)) {
+      perror("stdin");
+      vm->halted = 1;
+      return;
+    }
+    vm->memory[B] = input == EOF ? -1 : input;
+    vm->pc += 3;
+    return;
+  }
+
   if (A < 0 || A >= MEMORY_SIZE) {
     vm->halted = 1;
     return;
