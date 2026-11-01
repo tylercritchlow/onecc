@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define MEMORY_SIZE 4096
@@ -12,3 +13,4 @@ typedef struct {
 
 void vm_step(SubleqVM *vm);
 void vm_run(SubleqVM *vm);
+void vm_dump(const SubleqVM *vm, size_t word_count, const char *title);

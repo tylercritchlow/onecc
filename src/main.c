@@ -1,5 +1,6 @@
-#include "assembler/lexer.h"
-
+#include "assembler/assembler.h"
+#include "file.h"
+#include "vm/vm_subleq.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,76 +9,43 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Usage: %s <file>\n", argv[0]);
     return 1;
   }
-  FILE *file = fopen(argv[1], "rb");
-  if (file == NULL) {
-    perror(argv[1]);
-    return 1;
-  }
-  size_t capacity = 4096;
-  size_t length = 0;
-  char *source = malloc(capacity);
+  char *source = read_file(argv[1]);
   if (source == NULL) {
-    fclose(file);
-    fprintf(stderr, "Out of memory\n");
     return 1;
   }
-  int ch;
-  while ((ch = fgetc(file)) != EOF) {
-    if (length == capacity - 1) {
-      if (capacity > (size_t)-1 / 2) {
-        fprintf(stderr, "Source too large\n");
-        free(source);
-        fclose(file);
-        return 1;
-      }
-      capacity *= 2;
-      char *grown = realloc(source, capacity);
-      if (grown == NULL) {
-        fprintf(stderr, "Out of memory\n");
-        free(source);
-        fclose(file);
-        return 1;
-      }
-      source = grown;
-    }
-    if (ch == 0) {
-      fprintf(stderr, "%s: embedded NUL in source\n", argv[1]);
-      free(source);
-      fclose(file);
-      return 1;
-    }
-    source[length++] = (char)ch;
-  }
-  if (ferror(file)) {
-    perror(argv[1]);
-    free(source);
-    fclose(file);
-    return 1;
-  }
-  fclose(file);
-  source[length] = '\0';
-
   Lexer lexer;
+  Parser parser;
+  Program program;
   lexer_init(&lexer, source);
+  parser_init(&parser, &lexer);
+  if (!parser_parse(&parser, &program)) {
+    free(source);
+    return 1;
+  }
+  MachineCode code;
+  if (!assemble(&program, &code)) {
+    free(program.statements);
+    free(source);
+    return 1;
+  }
   int status = 0;
-  for (;;) {
-    Token token = lexer_next(&lexer);
-    if (token.type == TOKEN_ERROR) {
-      fprintf(stderr, "%s:%zu:%zu: unexpected character 0x%02x\n", argv[1],
-              token.line, token.column, (unsigned char)*token.start);
+  if (code.count > MEMORY_SIZE) {
+    fprintf(stderr, "Program exceeds VM memory (%d words)\n", MEMORY_SIZE);
+    status = 1;
+  } else {
+    SubleqVM vm = {0};
+    for (size_t i = 0; i < code.count; ++i)
+      vm.memory[i] = code.words[i];
+    vm_dump(&vm, code.count, "Before execution");
+    vm_run(&vm);
+    vm_dump(&vm, code.count, "After execution");
+    if (!vm.halted) {
+      fprintf(stderr, "VM reached its instruction limit\n");
       status = 1;
-    } else {
-      printf("%zu:%zu %s", token.line, token.column, token_name(token.type));
-      if (token.type != TOKEN_NEWLINE && token.type != TOKEN_EOF) {
-        putchar(' ');
-        fwrite(token.start, 1, token.length, stdout);
-      }
-      putchar('\n');
-    }
-    if (token.type == TOKEN_EOF) {
-      break;
     }
   }
+  free(code.words);
+  free(program.statements);
   free(source);
   return status;
 }

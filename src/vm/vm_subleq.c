@@ -1,4 +1,5 @@
 #include "vm_subleq.h"
+#include <inttypes.h>
 #include <stdio.h>
 
 #define INSTRUCTION_LIM 256
@@ -59,4 +60,16 @@ void vm_run(SubleqVM *vm) {
     vm_step(vm);
     instructions_ran++;
   }
+}
+
+void vm_dump(const SubleqVM *vm, size_t word_count, const char *title) {
+  printf("%s\n", title);
+  printf("PC: %" PRId64 "  Halted: %s\n", vm->pc, vm->halted ? "yes" : "no");
+  printf("Address  Value\n");
+  for (size_t i = 0; i < MEMORY_SIZE; ++i) {
+    if (i < word_count || vm->memory[i] != 0) {
+      printf("%7zu  %" PRId64 "\n", i, vm->memory[i]);
+    }
+  }
+  putchar('\n');
 }

@@ -66,6 +66,7 @@
           "${tests}/bin/test_vm" "$@" || status=1
           "${tests}/bin/test_lexer" "$@" || status=1
           "${tests}/bin/test_parser" "$@" || status=1
+          "${tests}/bin/test_assembler" "$@" || status=1
           exit "$status"
         '';
       in {
