@@ -31,12 +31,25 @@ void vm_step(SubleqVM *vm) {
   int64_t B = vm->memory[vm->pc + 1];
   int64_t C = vm->memory[vm->pc + 2];
 
-  if (A < 0 || A >= MEMORY_SIZE || B < 0 || B >= MEMORY_SIZE) {
+  if (A < 0 || A >= MEMORY_SIZE) {
     vm->halted = 1;
     return;
   }
 
   int64_t source = vm->memory[A];
+  // A destination of -1 prints the source's low byte and continues.
+  if (B == -1) {
+    if (putchar((unsigned char)source) == EOF) {
+      vm->halted = 1;
+      return;
+    }
+    vm->pc += 3;
+    return;
+  }
+  if (B < 0 || B >= MEMORY_SIZE) {
+    vm->halted = 1;
+    return;
+  }
   int64_t destination = vm->memory[B];
   if ((source > 0 && destination < INT64_MIN + source) ||
       (source < 0 && destination > INT64_MAX + source)) {
